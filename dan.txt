@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteelTrack Control Center | Gestão Inteligente de Entregas Metálicas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary:#0d2137; --primary-light:#132f4c; --secondary:#f57c00; --secondary-light:#ff9800;
+            --white:#fff; --bg:#f5f7fa; --bg-card:#fff; --text:#1a1a2e; --text-light:#5a6a7e;
+            --border:#e2e8f0; --success:#10b981; --danger:#ef4444; --warning:#f59e0b; --info:#3b82f6;
+            --shadow-sm:0 1px 3px rgba(0,0,0,.04); --shadow:0 4px 20px rgba(0,0,0,.06);
+            --shadow-lg:0 12px 40px rgba(0,0,0,.1); --radius-sm:8px; --radius:14px; --radius-lg:20px;
+            --transition:all .25s cubic-bezier(.4,0,.2,1);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+        .topbar{background:rgba(13,33,55,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.08);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1000;gap:16px}
+        .brand{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;text-decoration:none}
+        .brand-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--secondary),var(--secondary-light));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:white;box-shadow:0 4px 12px rgba(245,124,0,.3)}
+        .brand-text h1{font-size:1.2rem;font-weight:800;color:white;letter-spacing:-0.5px;line-height:1}
+        .brand-text h1 span{color:var(--secondary)}
+        .brand-text small{font-size:.6rem;color:rgba(255,255,255,.5);letter-spacing:.5px;font-weight:500;text-transform:uppercase}
+        .nav-menu{display:flex;gap:4px;background:rgba(255,255,255,.04);padding:4px;border-radius:40px;flex-wrap:wrap}
+        .nav-menu button{background:0 0;border:none;color:rgba(255,255,255,.7);padding:8px 14px;border-radius:40px;cursor:pointer;font-weight:600;font-size:.75rem;display:flex;align-items:center;gap:6px;transition:var(--transition);white-space:nowrap}
+        .nav-menu button:hover{color:white;background:rgba(255,255,255,.08)}
+        .nav-menu button.active{background:var(--secondary);color:white;box-shadow:0 4px 12px rgba(245,124,0,.35)}
+        .user-section{display:flex;align-items:center;gap:10px}
+        .icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);position:relative;font-size:.9rem}
+        .icon-btn:hover{background:rgba(255,255,255,.12)}
+        .badge-dot{position:absolute;top:6px;right:6px;width:9px;height:9px;background:var(--danger);border-radius:50%;border:2px solid var(--primary)}
+        .btn-outline-light{background:0 0;border:1.5px solid rgba(255,255,255,.3);color:white;padding:8px 16px;border-radius:40px;font-weight:600;font-size:.78rem;cursor:pointer;transition:var(--transition)}
+        .btn-outline-light:hover{background:rgba(255,255,255,.1)}
+        .btn-primary-sm{background:var(--secondary);color:white;border:none;padding:8px 16px;border-radius:40px;font-weight:700;font-size:.78rem;cursor:pointer;transition:var(--transition)}
+        .btn-primary-sm:hover{background:#e06800}
+        .main-content{max-width:1440px;margin:0 auto;padding:0;width:100%;flex:1}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);border:1px solid var(--border);margin-bottom:18px}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+        .card-header h3{font-size:1.05rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px}
+        .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+        .input-field{padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;background:#fafbfc;transition:var(--transition);width:100%;color:var(--text)}
+        .input-field:focus{outline:none;border-color:var(--secondary);box-shadow:0 0 0 4px rgba(245,124,0,.08);background:white}
+        select.input-field{cursor:pointer}
+        .btn{padding:11px 20px;border-radius:var(--radius-sm);font-weight:700;font-size:.83rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:var(--transition);border:none;white-space:nowrap}
+        .btn-primary{background:var(--primary);color:white}.btn-primary:hover{background:var(--primary-light)}
+        .btn-warning{background:var(--secondary);color:white}.btn-warning:hover{background:#e06800}
+        .btn-success{background:var(--success);color:white}.btn-danger{background:var(--danger);color:white}
+        .btn-sm{padding:7px 12px;font-size:.75rem}
+        .table-wrap{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;font-size:.83rem}
+        th{background:#f8fafc;color:var(--text-light);padding:12px 14px;text-align:left;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)}
+        td{padding:12px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+        tr:hover td{background:#fafbfd}
+        .status-badge{padding:4px 10px;border-radius:20px;font-weight:700;font-size:.7rem;letter-spacing:.3px;text-transform:uppercase;display:inline-block}
+        .status-recebido{background:#eff6ff;color:#2563eb}.status-separacao{background:#fefce8;color:#ca8a04}
+        .status-carregado{background:#fff7ed;color:#ea580c}.status-rota{background:#f5f3ff;color:#7c3aed}
+        .status-entregue{background:#ecfdf5;color:#059669}.status-atraso{background:#fef2f2;color:#dc2626}
+        .status-novaprev{background:#e0f2f1;color:#00695c}
+        .hidden{display:none!important}.mt-2{margin-top:14px}.text-sm{font-size:.76rem}.text-gray{color:var(--text-light)}.text-center{text-align:center}
+        .whatsapp-float{position:fixed;bottom:24px;right:24px;z-index:999;width:56px;height:56px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.6rem;box-shadow:0 6px 20px rgba(37,211,102,.4);cursor:pointer;transition:var(--transition);animation:floatWpp 3s ease-in-out infinite}
+        .whatsapp-float:hover{transform:scale(1.15)}
+        @keyframes floatWpp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        .hero-full{position:relative;background:linear-gradient(160deg,#060e18 0%,#0d2137 35%,#132f4c 70%,#0a1a2e 100%);padding:80px 24px 100px;overflow:hidden;min-height:85vh;display:flex;align-items:center}
+        .hero-particles{position:absolute;inset:0;pointer-events:none}
+        .particle{position:absolute;border-radius:50%;opacity:.15;animation:floatUp linear infinite}
+        .particle:nth-child(1){width:4px;height:4px;background:#f57c00;left:10%;animation-duration:8s;animation-delay:0s}
+        .particle:nth-child(2){width:6px;height:6px;background:#ff9800;left:25%;animation-duration:12s;animation-delay:1s}
+        .particle:nth-child(3){width:3px;height:3px;background:#fff;left:40%;animation-duration:10s;animation-delay:2s}
+        .particle:nth-child(4){width:5px;height:5px;background:#f57c00;left:55%;animation-duration:14s;animation-delay:.5s}
+        .particle:nth-child(5){width:7px;height:7px;background:#ff9800;left:70%;animation-duration:9s;animation-delay:3s}
+        .particle:nth-child(6){width:4px;height:4px;background:#fff;left:85%;animation-duration:11s;animation-delay:1.5s}
+        .particle:nth-child(7){width:3px;height:3px;background:#f57c00;left:15%;animation-duration:13s;animation-delay:2.5s}
+        .particle:nth-child(8){width:5px;height:5px;background:#ff9800;left:60%;animation-duration:7s;animation-delay:.8s}
+        @keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}20%{opacity:.2}80%{opacity:.2}100%{transform:translateY(-100px) scale(1.5);opacity:0}}
+        .floating-icons{position:absolute;inset:0;pointer-events:none}
+        .float-icon{position:absolute;font-size:2rem;opacity:.08;animation:floatIcon 15s linear infinite;color:white}
+        .float-icon:nth-child(1){top:15%;left:5%;animation-delay:0s;font-size:2.5rem}
+        .float-icon:nth-child(2){top:60%;left:90%;animation-delay:3s;font-size:3rem}
+        .float-icon:nth-child(3){top:75%;left:10%;animation-delay:6s;font-size:2rem}
+        .float-icon:nth-child(4){top:20%;left:80%;animation-delay:9s;font-size:2.8rem}
+        .float-icon:nth-child(5){top:50%;left:50%;animation-delay:12s;font-size:1.8rem}
+        @keyframes floatIcon{0%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-30px) rotate(5deg)}50%{transform:translateY(0) rotate(0deg)}75%{transform:translateY(30px) rotate(-5deg)}100%{transform:translateY(0) rotate(0deg)}}
+        .hero-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:2;width:100%}
+        .hero-left h2{font-size:3.2rem;font-weight:900;color:white;line-height:1.15;margin-bottom:20px;letter-spacing:-1.5px}
+        .hero-left h2 span{background:linear-gradient(135deg,#f57c00,#ff9800,#f57c00);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientText 3s ease infinite}
+        @keyframes gradientText{0%,100%{background-position:0% center}50%{background-position:200% center}}
+        .hero-left p{font-size:1.15rem;color:rgba(255,255,255,.7);margin-bottom:32px;line-height:1.8;max-width:520px}
+        .hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+        .btn-hero{padding:16px 32px;border-radius:50px;font-weight:700;font-size:.95rem;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .3s ease;border:none;position:relative;overflow:hidden}
+        .btn-hero-primary{background:linear-gradient(135deg,#f57c00,#ff9800);color:white;box-shadow:0 8px 28px rgba(245,124,0,.35)}
+        .btn-hero-primary:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(245,124,0,.5)}
+        .btn-hero-secondary{background:rgba(255,255,255,.06);color:white;border:2px solid rgba(255,255,255,.25)}
+        .btn-hero-secondary:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.5)}
+        .hero-right{position:relative;display:flex;justify-content:center;align-items:center}
+        .hero-mockup{position:relative;width:100%;max-width:480px}
+        .mockup-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px;backdrop-filter:blur(10px);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+        .mockup-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+        .mockup-row:last-child{border:none}
+        .mockup-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+        .mockup-dot.green{background:#10b981;box-shadow:0 0 10px #10b981}
+        .mockup-dot.orange{background:#f57c00;box-shadow:0 0 10px #f57c00;animation:pulse 1.5s infinite}
+        .mockup-dot.blue{background:#3b82f6}
+        .mockup-info{flex:1}
+        .mockup-info .big{font-size:1.6rem;font-weight:900;color:white}
+        .mockup-info .small{font-size:.7rem;color:rgba(255,255,255,.5);text-transform:uppercase}
+        @keyframes pulse{0%,100%{box-shadow:0 0 8px #f57c00}50%{box-shadow:0 0 22px #f57c00,0 0 40px rgba(245,124,0,.4)}}
+        .section-pad{padding:80px 24px;max-width:1400px;margin:0 auto;width:100%}
+        .section-title{text-align:center;margin-bottom:50px}
+        .section-title h2{font-size:2.2rem;font-weight:900;color:var(--primary);margin-bottom:10px}
+        .section-title .line{width:60px;height:4px;background:var(--secondary);margin:12px auto;border-radius:2px}
+        .section-title p{color:var(--text-light);font-size:.95rem;max-width:600px;margin:0 auto}
+        .solutions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+        .solution-card{background:var(--bg-card);border-radius:var(--radius);padding:30px 24px;box-shadow:var(--shadow-sm);border:1px solid var(--border);text-align:center;transition:all .3s ease;position:relative;overflow:hidden}
+        .solution-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:var(--secondary);transform:scaleX(0);transition:transform .3s ease}
+        .solution-card:hover::before{transform:scaleX(1)}
+        .solution-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--secondary-light)}
+        .solution-icon{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px}
+        .solution-card h4{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:6px}
+        .solution-card p{font-size:.82rem;color:var(--text-light)}
+        .counters-strip{background:var(--primary);padding:50px 24px}
+        .counters-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;text-align:center}
+        .counter-item{color:white}
+        .counter-item .counter-num{font-size:2.8rem;font-weight:900}
+        .counter-item .counter-lbl{font-size:.8rem;opacity:.7;text-transform:uppercase;letter-spacing:1px}
+        .testimonial-scroll{display:flex;gap:20px;overflow-x:auto;padding:10px 0;scroll-snap-type:x mandatory}
+        .testimonial-card{min-width:340px;background:var(--bg-card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--border);scroll-snap-align:start;flex-shrink:0}
+        .testimonial-card .quote{color:var(--secondary);font-size:2rem;margin-bottom:8px}
+        .testimonial-card p{font-size:.85rem;color:var(--text);font-style:italic;margin-bottom:12px}
+        .testimonial-card .author{font-weight:700;color:var(--primary);font-size:.8rem}
+        .diff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:28px}
+        .diff-card{background:var(--bg-card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);border:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;transition:var(--transition)}
+        .diff-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--secondary-light)}
+        .diff-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;background:#fff7ed;color:var(--secondary)}
+        .diff-text h4{font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:2px}
+        .diff-text p{font-size:.76rem;color:var(--text-light)}
+        .timeline{position:relative;padding-left:30px;margin:12px 0}
+        .timeline::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:3px;background:#ddd}
+        .tl-item{position:relative;margin-bottom:16px;padding:10px 14px;border-radius:8px;font-weight:600;font-size:.85rem;display:flex;align-items:center;gap:10px}
+        .tl-item::before{content:'';position:absolute;left:-23px;top:12px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:3px solid white;box-shadow:0 0 0 3px var(--primary)}
+        .tl-item.passed{opacity:.5}.tl-item.passed::before{background:var(--success);box-shadow:0 0 0 3px var(--success)}
+        .tl-item.current{background:#fff8e1;border:1px solid var(--secondary)}
+        .tl-item.current::before{background:var(--secondary);box-shadow:0 0 0 3px var(--secondary);animation:pulse 1.5s infinite}
+        .map-container{position:relative;width:100%;height:420px;background:#e8ecf1;border-radius:14px;overflow:hidden;border:2px solid #e2e8f0}
+        @media(max-width:768px){.topbar{padding:0 14px}.hero-inner{grid-template-columns:1fr;text-align:center}.hero-left h2{font-size:2rem}.hero-left p{max-width:100%}.hero-btns{justify-content:center}.nav-menu{display:none}.section-pad{padding:40px 16px}}
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand" onclick="navigateTo('home')">
+            <div class="brand-icon"><i class="fas fa-truck-fast"></i></div>
+            <div class="brand-text"><h1>STEEL<span>TRACK</span></h1><small>Controle Logístico Inteligente</small></div>
+        </div>
+        <nav class="nav-menu" id="navMenu"></nav>
+        <div class="user-section">
+            <button class="icon-btn hidden" id="notifBtn" onclick="openNotifModal()"><i class="fas fa-bell"></i><span class="badge-dot hidden" id="notifDot"></span></button>
+            <span id="greeting" style="color:rgba(255,255,255,.7);font-size:.78rem;font-weight:500;"></span>
+            <button class="btn-outline-light hidden" id="logoutBtn" onclick="logout()">Sair</button>
+            <button class="btn-primary-sm" id="loginBtn" onclick="navigateTo('login')">Entrar</button>
+        </div>
+    </header>
+    <main class="main-content" id="appContent"></main>
+    <a class="whatsapp-float" id="whatsappFloat" href="https://wa.me/5537984024855?text=Ol%C3%A1%20SteelTrack!" target="_blank" title="Falar no WhatsApp"><i class="fab fa-whatsapp"></i></a>
+
+    <script>
+        const STATE = {
+            user: null, view: 'home',
+            deliveries: JSON.parse(localStorage.getItem('st_deliveries') || '[]'),
+            users: JSON.parse(localStorage.getItem('st_users') || '[]'),
+            fleet: JSON.parse(localStorage.getItem('st_fleet') || '[]'),
+            history: JSON.parse(localStorage.getItem('st_history') || '[]'),
+            contacts: JSON.parse(localStorage.getItem('st_contacts') || '{}'),
+            purchaseHistory: JSON.parse(localStorage.getItem('st_purchases') || '[]')
+        };
+        if (!STATE.deliveries.length) {
+            STATE.deliveries = [
+                { id:'ST-1001',cliente:'Construtora Alfa',produto:'Tubos 4"',origem:'São Paulo SP',destino:'Campinas SP',status:'Em Rota',motorista:'Marcos Silva',veiculo:'Caminhão 07',placa:'ABC-1234',previsao:'16:30',data:'2026-04-20',peso:'500kg',nota:'NF 12345',clienteEmail:'cliente@obra.com',clienteTel:'5537999999999',etapas:['Recebido','Separação','Carregado','Em Rota'] },
+                { id:'ST-1002',cliente:'Metalúrgica Beta',produto:'Chapas 6mm',origem:'BH MG',destino:'Vitória ES',status:'Entregue',motorista:'João Pedro',veiculo:'Caminhão 03',placa:'DEF-5678',previsao:'10:00',data:'2026-04-18',peso:'800kg',nota:'NF 12346',clienteEmail:'cliente@obra.com',clienteTel:'5537999999999',etapas:['Recebido','Separação','Carregado','Em Rota','Entregue'] },
+                { id:'ST-1003',cliente:'Obra Industrial',produto:'Perfis L',origem:'Rio RJ',destino:'São Paulo SP',status:'Atrasado',motorista:'Carlos Lima',veiculo:'Caminhão 05',placa:'GHI-9012',previsao:'09:15',data:'2026-04-17',peso:'1200kg',nota:'NF 12347',clienteEmail:'cliente@obra.com',clienteTel:'5537999999999',etapas:['Recebido','Separação','Carregado','Em Rota'] },
+                { id:'ST-1004',cliente:'Cliente Delta',produto:'Steel Deck',origem:'Curitiba PR',destino:'Florianópolis SC',status:'Separação',motorista:'-',veiculo:'-',previsao:'—',data:'2026-04-22',peso:'300kg',nota:'NF 12348',clienteEmail:'cliente@obra.com',clienteTel:'5537999999999',etapas:['Recebido','Separação'] }
+            ];
+        }
+        if (!STATE.purchaseHistory.length) {
+            STATE.purchaseHistory = [
+                { id:'PED-001',cliente:'Construtora Alfa',produto:'Tubos 4"',quantidade:'200 unidades',data:'2025-08-15',valor:'R$ 12.500,00',nota:'NF 08765',status:'Entregue' },
+                { id:'PED-002',cliente:'Metalúrgica Beta',produto:'Chapas 6mm',quantidade:'50 chapas',data:'2025-07-22',valor:'R$ 18.200,00',nota:'NF 09123',status:'Entregue' },
+                { id:'PED-003',cliente:'Obra Industrial',produto:'Perfis L',quantidade:'350 metros',data:'2025-06-10',valor:'R$ 8.900,00',nota:'NF 10456',status:'Entregue' },
+                { id:'PED-004',cliente:'Cliente Delta',produto:'Telhas Galvanizadas',quantidade:'500 unidades',data:'2025-05-28',valor:'R$ 22.400,00',nota:'NF 11234',status:'Entregue' },
+                { id:'PED-005',cliente:'Construtora Alfa',produto:'Steel Deck',quantidade:'1200 m²',data:'2025-04-14',valor:'R$ 35.100,00',nota:'NF 12890',status:'Entregue' },
+                { id:'PED-006',cliente:'Metalúrgica Beta',produto:'Lambril',quantidade:'300 peças',data:'2025-03-30',valor:'R$ 6.800,00',nota:'NF 13567',status:'Entregue' },
+                { id:'PED-007',cliente:'Obra Industrial',produto:'Calhas',quantidade:'80 metros',data:'2025-02-18',valor:'R$ 4.500,00',nota:'NF 14234',status:'Entregue' },
+                { id:'PED-008',cliente:'Cliente Delta',produto:'Tubos 6"',quantidade:'150 unidades',data:'2025-01-05',valor:'R$ 15.800,00',nota:'NF 15890',status:'Entregue' }
+            ];
+        }
+        if (!STATE.users.length) STATE.users = [
+            { email:'admin@steeltrack.com',pass:'123456',name:'Admin SteelTrack',role:'admin' },
+            { email:'cliente@obra.com',pass:'123456',name:'Cliente Obra',role:'cliente' },
+            { email:'motorista@steeltrack.com',pass:'123456',name:'Marcos Silva',role:'motorista' }
+        ];
+        if (!STATE.fleet.length) STATE.fleet = [
+            { id:'C07',placa:'ABC-1234',motorista:'Marcos Silva',capacidade:'5 ton',status:'Em rota',manutencao:'OK' },
+            { id:'C03',placa:'DEF-5678',motorista:'João Pedro',capacidade:'3 ton',status:'Disponível',manutencao:'OK' },
+            { id:'C05',placa:'GHI-9012',motorista:'Carlos Lima',capacidade:'8 ton',status:'Em rota',manutencao:'Pendente pneu' }
+        ];
+
+        function saveAll(){localStorage.setItem('st_deliveries',JSON.stringify(STATE.deliveries));localStorage.setItem('st_users',JSON.stringify(STATE.users));localStorage.setItem('st_fleet',JSON.stringify(STATE.fleet));localStorage.setItem('st_history',JSON.stringify(STATE.history));localStorage.setItem('st_purchases',JSON.stringify(STATE.purchaseHistory));localStorage.setItem('st_contacts',JSON.stringify(STATE.contacts));}
+        function addHistory(action,detail){STATE.history.unshift({action,detail,user:STATE.user?STATE.user.name:'Sistema',time:new Date().toISOString()});if(STATE.history.length>100)STATE.history.pop();saveAll();}
+        function navigateTo(v){STATE.view=v;render();window.scrollTo({top:0,behavior:'smooth'});}
+        function render(){updateUI();var c=document.getElementById('appContent');var views={home:homeView,login:loginView,portal:portalView,rastreio:trackView,admin:adminView,torre:torreView,motorista:motoristaView,historico:historyView,perfil:profileView,compras:purchaseHistoryView};c.innerHTML=(views[STATE.view]||homeView)();bindEvents();}
+        function updateUI(){
+            document.getElementById('loginBtn').classList.toggle('hidden',!!STATE.user);
+            document.getElementById('logoutBtn').classList.toggle('hidden',!STATE.user);
+            document.getElementById('greeting').textContent=STATE.user?'Olá, '+STATE.user.name.split(' ')[0]:'';
+            var unread=(JSON.parse(localStorage.getItem('st_notifs')||'[]')).filter(function(n){return !n.read;}).length;
+            document.getElementById('notifDot').classList.toggle('hidden',unread===0);
+            document.getElementById('notifBtn').classList.toggle('hidden',!STATE.user);
+            var nav=document.getElementById('navMenu');
+            var html='<button onclick="navigateTo(\'home\')" data-v="home"><i class="fas fa-home"></i> Início</button>';
+            if(STATE.user){
+                var r=STATE.user.role;
+                if(r==='cliente')html+='<button onclick="navigateTo(\'portal\')" data-v="portal"><i class="fas fa-building"></i> Meus Pedidos</button><button onclick="navigateTo(\'compras\')" data-v="compras"><i class="fas fa-box"></i> Minhas Compras</button><button onclick="navigateTo(\'rastreio\')" data-v="rastreio"><i class="fas fa-search"></i> Rastrear</button>';
+                if(r==='admin')html+='<button onclick="navigateTo(\'admin\')" data-v="admin"><i class="fas fa-cogs"></i> Painel</button><button onclick="navigateTo(\'torre\')" data-v="torre"><i class="fas fa-map"></i> Torre</button><button onclick="navigateTo(\'rastreio\')" data-v="rastreio"><i class="fas fa-search"></i> Rastrear</button><button onclick="navigateTo(\'compras\')" data-v="compras"><i class="fas fa-box"></i> Compras</button>';
+                if(r==='motorista')html+='<button onclick="navigateTo(\'motorista\')" data-v="motorista"><i class="fas fa-truck"></i> App</button>';
+                html+='<button onclick="navigateTo(\'historico\')" data-v="historico"><i class="fas fa-history"></i> Histórico</button><button onclick="navigateTo(\'perfil\')" data-v="perfil"><i class="fas fa-user-circle"></i> Perfil</button>';
+            }else{html+='<button onclick="navigateTo(\'rastreio\')" data-v="rastreio"><i class="fas fa-search"></i> Rastrear</button>';}
+            nav.innerHTML=html;
+            document.querySelectorAll('#navMenu button[data-v]').forEach(function(b){b.classList.toggle('active',b.dataset.v===STATE.view);});
+        }
+        function bindEvents(){
+            var lf=document.getElementById('loginForm');if(lf)lf.addEventListener('submit',handleLogin);
+            var tb=document.getElementById('trackBtn');if(tb)tb.addEventListener('click',doTrack);
+            var sb=document.getElementById('simBtn');if(sb)sb.addEventListener('click',doSimulate);
+            var nd=document.getElementById('newDelForm');if(nd)nd.addEventListener('submit',addDelivery);
+            var us=document.getElementById('updStatusBtn');if(us)us.addEventListener('click',updateStatus);
+            var pf=document.getElementById('podForm');if(pf)pf.addEventListener('submit',submitPOD);
+            var rf=document.getElementById('rfidBtn');if(rf)rf.addEventListener('click',readRFID);
+            var af=document.getElementById('addFleetForm');if(af)af.addEventListener('submit',addFleet);
+            var tf=document.getElementById('telForm');if(tf)tf.addEventListener('submit',savePhone);
+            var df=document.getElementById('delayForm');if(df)df.addEventListener('submit',notifyDelay);
+        }
+        function addNotification(title,msg,type,action){
+            var notifs=JSON.parse(localStorage.getItem('st_notifs')||'[]');
+            notifs.unshift({id:Date.now(),title,msg,type:type||'info',action:action||null,read:false,ts:new Date().toISOString()});
+            localStorage.setItem('st_notifs',JSON.stringify(notifs));updateUI();
+        }
+        function openNotifModal(){
+            var notifs=JSON.parse(localStorage.getItem('st_notifs')||'[]');
+            var html='<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center;" onclick="this.remove()"><div style="background:white;border-radius:16px;width:90%;max-width:500px;max-height:70vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);padding:20px;" onclick="event.stopPropagation()"><h3 style="margin-bottom:16px;"><i class="fas fa-bell" style="color:var(--secondary);"></i> Notificações</h3>';
+            if(!notifs.length)html+='<p class="text-gray text-center">Nenhuma notificação.</p>';
+            else notifs.forEach(function(n){html+='<div style="padding:10px;border-bottom:1px solid #eee;cursor:pointer;'+(n.read?'':'background:#f8faff;')+'" onclick="this.querySelector(\'span\').remove();'+(n.action||'')+'">'+n.title+': '+n.msg+' '+(n.read?'':'<span style="width:8px;height:8px;background:var(--info);border-radius:50%;display:inline-block;"></span>')+'</div>';n.read=true;});
+            html+='</div></div>';localStorage.setItem('st_notifs',JSON.stringify(notifs));document.body.insertAdjacentHTML('beforeend',html);updateUI();
+        }
+        function notifyCustomer(delivery){
+            var msgs={
+                'Recebido':{t:'?? Pedido Registrado',m:'Pedido '+delivery.id+' recebido.',ty:'info'},
+                'Separação':{t:'?? Em Separação',m:'Pedido '+delivery.id+' em separação no CD.',ty:'info'},
+                'Carregado':{t:'?? Carga Carregada',m:'Pedido '+delivery.id+' carregado. Motorista: '+delivery.motorista+'.',ty:'success'},
+                'Em Rota':{t:'??? Saiu para Entrega!',m:'Pedido '+delivery.id+' saiu para entrega! Previsão: '+delivery.previsao,ty:'warning',act:'navigateTo(\'rastreio\');setTimeout(function(){document.getElementById(\'trackInput\').value=\''+delivery.id+'\';doTrack();},100)'},
+                'Entregue':{t:'? Entrega Concluída',m:'Pedido '+delivery.id+' entregue!',ty:'success'},
+                'Atrasado':{t:'?? Alerta de Atraso',m:'Pedido '+delivery.id+' atrasado.',ty:'error'}
+            };
+            var m=msgs[delivery.status];if(m)addNotification(m.t,m.m,m.ty,m.act||null);
+            if(delivery.status==='Em Rota')notifyWhatsApp(delivery);
+        }
+        function notifyWhatsApp(delivery){
+            var tel=delivery.clienteTel||STATE.contacts[delivery.clienteEmail]||'5537999999999';
+            var msg='?? *SteelTrack - Entrega em Rota!*\n\n?? Pedido: '+delivery.id+'\n?? Produto: '+delivery.produto+'\n?? Motorista: '+delivery.motorista+'\n?? Veículo: '+delivery.veiculo+'\n?? Previsão: '+delivery.previsao+'\n\nAcompanhe no portal.';
+            var url='https://wa.me/'+tel+'?text='+encodeURIComponent(msg);
+            document.getElementById('whatsappFloat').href=url;
+            addNotification('WhatsApp','Link de notificação gerado para o pedido '+delivery.id,'success','window.open(\''+url+'\',\'_blank\')');
+        }
+
+        // ========== HOME PAGE ==========
+        function homeView(){
+            var t=STATE.deliveries.length,r=STATE.deliveries.filter(function(d){return d.status==='Em Rota'}).length;
+            var h='<div class="hero-full"><div class="hero-particles">'+Array.from({length:8},function(_,i){return '<div class="particle"></div>'}).join('')+'</div>';
+            h+='<div class="floating-icons"><i class="fas fa-truck float-icon"></i><i class="fas fa-box float-icon"></i><i class="fas fa-industry float-icon"></i><i class="fas fa-cogs float-icon"></i><i class="fas fa-shipping-fast float-icon"></i></div>';
+            h+='<div class="hero-inner"><div class="hero-left"><h2>Transforme sua <span>Logística Metálica</span> em Vantagem Competitiva</h2><p>A SteelTrack é a plataforma mais completa para rastreamento e gestão de entregas de tubos, chapas, perfis, telhas e steel deck. Do pedido à entrega, cada etapa monitorada em tempo real.</p><div class="hero-btns"><button class="btn-hero btn-hero-primary" onclick="'+ (STATE.user?"navigateTo('rastreio')":"navigateTo('login')") +'"><i class="fas fa-play"></i> Comece Agora</button><button class="btn-hero btn-hero-secondary" onclick="document.getElementById(\'sectionSolutions\').scrollIntoView({behavior:\'smooth\'})"><i class="fas fa-info-circle"></i> Nossas Soluções</button></div></div><div class="hero-right"><div class="hero-mockup"><div class="mockup-card"><div class="mockup-row"><div class="mockup-dot green"></div><div class="mockup-info"><div class="big">'+STATE.deliveries.filter(function(d){return d.status==='Entregue'}).length+'</div><div class="small">Entregas Realizadas</div></div></div><div class="mockup-row"><div class="mockup-dot orange"></div><div class="mockup-info"><div class="big">'+r+'</div><div class="small">Veículos em Rota Agora</div></div></div><div class="mockup-row"><div class="mockup-dot blue"></div><div class="mockup-info"><div class="big">99.8%</div><div class="small">Índice de Precisão</div></div></div></div></div></div></div></div>';
+            h+='<div class="counters-strip"><div class="counters-inner"><div class="counter-item"><div class="counter-num">+500</div><div class="counter-lbl">Clientes Atendidos</div></div><div class="counter-item"><div class="counter-num">'+STATE.deliveries.filter(function(d){return d.status==='Entregue'}).length+'</div><div class="counter-lbl">Entregas/Mês</div></div><div class="counter-item"><div class="counter-num">24/7</div><div class="counter-lbl">Monitoramento</div></div><div class="counter-item"><div class="counter-num">98%</div><div class="counter-lbl">OTIF Médio</div></div></div></div>';
+            h+='<div class="section-pad" id="sectionSolutions"><div class="section-title"><h2>Soluções que Entregam Resultado</h2><div class="line"></div><p>Módulos integrados para cada etapa da sua operação logística</p></div><div class="solutions-grid">';
+            var sols=[{i:'fa-satellite-dish',c:'#eff6ff',col:'var(--info)',t:'Rastreamento em Tempo Real',d:'Cada pedido monitorado com atualizações instantâneas de status e localização GPS.'},{i:'fa-user-tie',c:'#fff7ed',col:'var(--secondary)',t:'Portal do Cliente',d:'Seus clientes acompanham entregas, baixam documentos e abrem ocorrências.'},{i:'fa-map-location-dot',c:'#ecfdf5',col:'var(--success)',t:'Torre de Controle',d:'Mapa situacional com todos os veículos em rota e alertas de atraso.'},{i:'fa-qrcode',c:'#f5f3ff',col:'#7c3aed',t:'RFID Integrado',d:'Leitura automática de cargas para conferência e atualização de status.'},{i:'fa-mobile-alt',c:'#fef2f2',col:'var(--danger)',t:'App do Motorista',d:'Rotas, checklist, prova de entrega digital e comunicação direta.'},{i:'fa-chart-bar',c:'#f0fdf4',col:'#059669',t:'Relatórios Gerenciais',d:'KPIs logísticos, OTIF, lead time e performance da frota.'}];
+            sols.forEach(function(s){h+='<div class="solution-card"><div class="solution-icon" style="background:'+s.c+';color:'+s.col+';"><i class="fas '+s.i+'"></i></div><h4>'+s.t+'</h4><p>'+s.d+'</p></div>';});
+            h+='</div></div>';
+            h+='<div class="section-pad" style="background:white;"><div class="section-title"><h2>Por que SteelTrack?</h2><div class="line"></div><p>Diferenciais que fazem a diferença na sua operação</p></div><div class="diff-grid">';
+            var diffs=[{i:'fa-bolt',t:'Atualização em Tempo Real',d:'Status dos pedidos atualizados instantaneamente via RFID e GPS.'},{i:'fa-mobile-alt',t:'App Mobile Dedicado',d:'Motoristas recebem rotas, registram entregas e reportam ocorrências.'},{i:'fa-shield-alt',t:'Segurança da Carga',d:'Monitoramento 24h com alertas automáticos de paradas não programadas.'},{i:'fa-headset',t:'Suporte Rápido',d:'Canal direto via WhatsApp para resolver ocorrências durante o transporte.'},{i:'fa-chart-bar',t:'Indicadores Logísticos',d:'Dashboard completo com OTIF, lead time e desempenho da frota.'},{i:'fa-industry',t:'Especialista em Metálicos',d:'Sistema projetado para cargas de tubos, chapas, perfis, telhas e steel deck.'}];
+            diffs.forEach(function(diff){h+='<div class="diff-card"><div class="diff-icon"><i class="fas '+diff.i+'"></i></div><div class="diff-text"><h4>'+diff.t+'</h4><p>'+diff.d+'</p></div></div>';});
+            h+='</div></div>';
+            h+='<div class="section-pad" style="background:white;"><div class="section-title"><h2>Quem Confia na SteelTrack</h2><div class="line"></div></div><div class="testimonial-scroll"><div class="testimonial-card"><div class="quote"><i class="fas fa-quote-right"></i></div><p>"A SteelTrack reduziu em 40% nossos atrasos de entrega."</p><div class="author">— Carlos Mendes, Diretor da Construtora Alfa</div></div><div class="testimonial-card"><div class="quote"><i class="fas fa-quote-right"></i></div><p>"O portal do cliente nos dá total visibilidade das cargas."</p><div class="author">— Ana Oliveira, Gerente da Metalúrgica Beta</div></div><div class="testimonial-card"><div class="quote"><i class="fas fa-quote-right"></i></div><p>"O app do motorista facilitou muito nosso dia a dia."</p><div class="author">— Marcos Silva, Motorista SteelTrack</div></div></div></div>';
+            if(!STATE.user)h+='<div class="section-pad text-center"><div class="card" style="max-width:600px;margin:0 auto;"><h3 style="margin-bottom:14px;">Pronto para Revolucionar sua Logística?</h3><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><button class="btn btn-primary" onclick="quickLogin(\'admin@steeltrack.com\')"><i class="fas fa-cogs"></i> Admin</button><button class="btn btn-warning" onclick="quickLogin(\'cliente@obra.com\')"><i class="fas fa-user"></i> Cliente</button><button class="btn btn-primary" onclick="quickLogin(\'motorista@steeltrack.com\')"><i class="fas fa-truck"></i> Motorista</button></div><p class="text-sm text-gray mt-2">Senha: 123456</p></div></div>';
+            return h;
+        }
+
+        // ========== LOGIN ==========
+        function loginView(){return '<div style="max-width:440px;margin:40px auto;"><div class="card"><div class="card-header"><h3><i class="fas fa-sign-in-alt"></i> Acessar SteelTrack</h3></div><form id="loginForm"><div style="display:grid;gap:12px;"><input class="input-field" type="email" id="loginEmail" placeholder="Email" required><input class="input-field" type="password" id="loginPassword" placeholder="Senha" required></div><button type="submit" class="btn btn-warning" style="width:100%;margin-top:16px;justify-content:center;"><i class="fas fa-sign-in-alt"></i> Entrar</button></form><p class="text-sm text-gray mt-2 text-center">admin@steeltrack.com / cliente@obra.com / motorista@steeltrack.com</p></div></div>';}
+
+        // ========== PORTAL DO CLIENTE (com notificação de atraso) ==========
+        function portalView(){
+            var d=STATE.deliveries;
+            var h='<div style="max-width:1200px;margin:40px auto;padding:0 20px;"><div class="card"><div class="card-header"><h3><i class="fas fa-building"></i> Portal do Cliente</h3></div><p>Bem-vindo, <strong>'+STATE.user.name+'</strong>.</p></div>';
+            h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px;">';
+            h+='<div class="stat-card" style="display:flex;align-items:center;gap:14px;padding:18px;background:white;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e2e8f0;"><div style="width:48px;height:48px;border-radius:12px;background:#eff6ff;color:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class="fas fa-clock"></i></div><div><h3 style="font-size:1.5rem;font-weight:800;">'+d.filter(function(x){return x.status!=='Entregue'}).length+'</h3><p style="font-size:.76rem;color:#5a6a7e;">Em Aberto</p></div></div>';
+            h+='<div class="stat-card" style="display:flex;align-items:center;gap:14px;padding:18px;background:white;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e2e8f0;"><div style="width:48px;height:48px;border-radius:12px;background:#fff7ed;color:#f57c00;display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class="fas fa-truck"></i></div><div><h3 style="font-size:1.5rem;font-weight:800;">'+d.filter(function(x){return x.status==='Em Rota'}).length+'</h3><p style="font-size:.76rem;color:#5a6a7e;">Em Rota</p></div></div>';
+            h+='</div>';
+            h+='<div class="card"><div class="card-header"><h3><i class="fas fa-clipboard-list"></i> Meus Pedidos</h3></div><div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Produto</th><th>Status</th><th>Previsão</th><th></th></tr></thead><tbody>'+d.map(function(x){return '<tr><td><strong>'+x.id+'</strong></td><td>'+x.produto+'</td><td><span class="status-badge status-'+x.status.toLowerCase().replace(' ','-')+'">'+x.status+'</span></td><td>'+x.previsao+'</td><td><button class="btn btn-sm btn-primary" onclick="navigateTo(\'rastreio\');setTimeout(function(){document.getElementById(\'trackInput\').value=\''+x.id+'\';doTrack();},100)"><i class="fas fa-search"></i></button></td></tr>';}).join('')+'</tbody></table></div></div>';
+            // NOVA ÁREA: Notificar Atraso
+            h+='<div class="card"><div class="card-header"><h3><i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i> Notificar Atraso</h3></div><p class="text-sm text-gray mb-2">Selecione um pedido para nos notificar sobre atraso na entrega. Nossa equipe será acionada imediatamente.</p><form id="delayForm"><div class="form-grid"><select class="input-field" id="delayPedido" required><option value="">Selecione o pedido...</option>'+d.filter(function(x){return x.status!=='Entregue'}).map(function(x){return '<option value="'+x.id+'">'+x.id+' - '+x.produto+' ('+x.status+')</option>';}).join('')+'</select><select class="input-field" id="delayMotivo"><option>Atraso na entrega</option><option>Cliente ausente</option><option>Endereço incorreto</option><option>Problema com veículo</option><option>Outros</option></select><input class="input-field" id="delayObs" placeholder="Observações adicionais"><button type="submit" class="btn btn-danger"><i class="fas fa-bell"></i> Notificar Atraso</button></div></form></div></div>';
+            return h;
+        }
+
+        // ========== HISTÓRICO DE COMPRAS ==========
+        function purchaseHistoryView(){
+            var h='<div style="max-width:1200px;margin:40px auto;padding:0 20px;"><div class="card"><div class="card-header"><h3><i class="fas fa-box"></i> Histórico de Compras</h3><span class="text-sm text-gray">Exibindo '+STATE.purchaseHistory.length+' compras realizadas</span></div>';
+            h+='<div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Cliente</th><th>Produto</th><th>Quantidade</th><th>Data</th><th>Valor</th><th>Nota Fiscal</th><th>Status</th></tr></thead><tbody>';
+            STATE.purchaseHistory.forEach(function(p){
+                h+='<tr><td><strong>'+p.id+'</strong></td><td>'+p.cliente+'</td><td>'+p.produto+'</td><td>'+p.quantidade+'</td><td>'+p.data+'</td><td>'+p.valor+'</td><td>'+p.nota+'</td><td><span class="status-badge status-entregue">'+p.status+'</span></td></tr>';
+            });
+            h+='</tbody></table></div>';
+            h+='<div style="margin-top:16px;padding:14px;background:#f0fdf4;border-radius:8px;"><i class="fas fa-info-circle" style="color:var(--success);"></i> Todos os pedidos acima foram entregues com sucesso pela SteelTrack. Para rastrear pedidos atuais, acesse o <a href="javascript:navigateTo(\'portal\')" style="color:var(--secondary);font-weight:700;">Portal do Cliente</a>.</div></div></div>';
+            return h;
+        }
+
+        // ========== PERFIL / CADASTRO TELEFONE ==========
+        function profileView(){
+            if(!STATE.user)return loginView();
+            var tel=STATE.contacts[STATE.user.email]||'';
+            var h='<div style="max-width:600px;margin:40px auto;"><div class="card"><div class="card-header"><h3><i class="fas fa-user-circle"></i> Meu Perfil</h3></div><p><strong>Nome:</strong> '+STATE.user.name+'</p><p><strong>Email:</strong> '+STATE.user.email+'</p><p><strong>Função:</strong> '+STATE.user.role+'</p></div>';
+            h+='<div class="card"><div class="card-header"><h3><i class="fab fa-whatsapp"></i> Cadastro de Telefone para Notificações</h3></div><p class="text-sm text-gray mb-2">Cadastre seu número com DDD para receber atualizações de entrega via WhatsApp quando seus pedidos entrarem em rota.</p><form id="telForm"><div style="display:flex;gap:10px;flex-wrap:wrap;"><input class="input-field" id="telInput" placeholder="Ex: 5537999999999" value="'+tel+'" style="flex:1;" required><button type="submit" class="btn btn-success"><i class="fab fa-whatsapp"></i> Salvar Número</button></div></form>'+(tel?'<p class="text-sm text-gray mt-2"><i class="fas fa-check-circle" style="color:var(--success);"></i> Número cadastrado: '+tel+'</p>':'')+'</div></div>';
+            return h;
+        }
+        function savePhone(e){e.preventDefault();var tel=document.getElementById('telInput').value.trim();if(!tel||tel.length<10){alert('Informe um número válido com DDD.');return;}STATE.contacts[STATE.user.email]=tel;saveAll();addHistory('Telefone Cadastrado','Número '+tel+' vinculado.');alert('Número cadastrado! Você receberá notificações via WhatsApp.');navigateTo('perfil');}
+
+        // ========== NOTIFICAR ATRASO (cliente) ==========
+        function notifyDelay(e){
+            e.preventDefault();
+            var pedido=document.getElementById('delayPedido').value;
+            var motivo=document.getElementById('delayMotivo').value;
+            var obs=document.getElementById('delayObs').value;
+            if(!pedido){alert('Selecione um pedido.');return;}
+            var del=STATE.deliveries.find(function(x){return x.id===pedido;});
+            if(del){
+                del.status='Atrasado';
+                if(!del.etapas.includes('Atrasado'))del.etapas.push('Atrasado');
+                saveAll();
+                addNotification('?? Cliente notificou atraso','Pedido '+pedido+' reportado como atrasado. Motivo: '+motivo+'. '+(obs||''),'error');
+                addHistory('Atraso Reportado','Cliente notificou atraso no pedido '+pedido+' - '+motivo);
+                alert('Atraso notificado! Nossa equipe de logística foi acionada e entrará em contato em breve.');
+                navigateTo('portal');
+            }
+        }
+
+        // ========== RASTREIO ==========
+        function trackView(){return '<div style="max-width:1200px;margin:40px auto;padding:0 20px;"><div class="card"><div class="card-header"><h3><i class="fas fa-search-location"></i> Rastreamento</h3></div><div style="display:flex;gap:10px;flex-wrap:wrap;"><input class="input-field" id="trackInput" placeholder="Código do pedido (ex: ST-1001)" style="flex:1;"><button class="btn btn-warning" id="trackBtn"><i class="fas fa-search"></i> Rastrear</button></div><div id="trackResult" class="mt-2"></div></div><div class="card"><div class="card-header"><h3><i class="fas fa-calculator"></i> Simular Frete</h3></div><div class="form-grid"><input class="input-field" id="cepO" placeholder="CEP Origem"><input class="input-field" id="cepD" placeholder="CEP Destino"><input class="input-field" id="peso" type="number" placeholder="Peso (kg)" value="100"><select class="input-field" id="servico"><option>PAC</option><option>SEDEX</option><option>Carga Fechada</option></select></div><button class="btn btn-primary mt-2" id="simBtn"><i class="fas fa-calculator"></i> Calcular</button><div id="simResult" class="mt-2"></div></div></div>';}
+
+        // ========== PAINEL ADMIN (com nova previsão) ==========
+        function adminView(){
+            var d=STATE.deliveries,f=STATE.fleet;
+            var h='<div style="max-width:1200px;margin:40px auto;padding:0 20px;"><div class="card"><div class="card-header"><h3><i class="fas fa-cogs"></i> Painel Admin</h3></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">';
+            h+='<div class="stat-card" style="display:flex;align-items:center;gap:14px;padding:18px;background:white;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e2e8f0;"><div style="width:48px;height:48px;border-radius:12px;background:#eff6ff;color:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class="fas fa-box"></i></div><div><h3 style="font-size:1.5rem;font-weight:800;">'+d.length+'</h3><p style="font-size:.76rem;color:#5a6a7e;">Total</p></div></div>';
+            h+='<div class="stat-card" style="display:flex;align-items:center;gap:14px;padding:18px;background:white;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e2e8f0;"><div style="width:48px;height:48px;border-radius:12px;background:#fff7ed;color:#f57c00;display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class="fas fa-truck"></i></div><div><h3 style="font-size:1.5rem;font-weight:800;">'+d.filter(function(x){return x.status==='Em Rota'}).length+'</h3><p style="font-size:.76rem;color:#5a6a7e;">Em Rota</p></div></div>';
+            h+='<div class="stat-card" style="display:flex;align-items:center;gap:14px;padding:18px;background:white;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e2e8f0;"><div style="width:48px;height:48px;border-radius:12px;background:#ecfdf5;color:#10b981;display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class="fas fa-check"></i></div><div><h3 style="font-size:1.5rem;font-weight:800;">'+d.filter(function(x){return x.status==='Entregue'}).length+'</h3><p style="font-size:.76rem;color:#5a6a7e;">Entregues</p></div></div>';
+            h+='<div class="stat-card" style="display:flex;align-items:center;gap:14px;padding:18px;background:white;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);border:1px solid #e2e8f0;"><div style="width:48px;height:48px;border-radius:12px;background:#fef2f2;color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.3rem;"><i class="fas fa-exclamation"></i></div><div><h3 style="font-size:1.5rem;font-weight:800;">'+d.filter(function(x){return x.status==='Atrasado'}).length+'</h3><p style="font-size:.76rem;color:#5a6a7e;">Atrasos</p></div></div>';
+            h+='</div></div>';
+            h+='<div class="card"><div class="card-header"><h3><i class="fas fa-plus-circle"></i> Cadastrar Pedido</h3></div><form id="newDelForm" class="form-grid"><input class="input-field" id="nId" placeholder="Código" required><input class="input-field" id="nCli" placeholder="Cliente"><input class="input-field" id="nProd" placeholder="Produto"><input class="input-field" id="nOrig" placeholder="Origem"><input class="input-field" id="nDest" placeholder="Destino"><select class="input-field" id="nStatus"><option>Recebido</option><option>Separação</option><option>Carregado</option><option>Em Rota</option><option>Entregue</option></select><input class="input-field" id="nMot" placeholder="Motorista"><input class="input-field" id="nVei" placeholder="Veículo"><input class="input-field" id="nPrev" placeholder="Previsão"><button type="submit" class="btn btn-warning"><i class="fas fa-plus"></i> Adicionar</button></form></div>';
+            // ATUALIZAR STATUS COM NOVA PREVISÃO
+            h+='<div class="card"><div class="card-header"><h3><i class="fas fa-sync"></i> Atualizar Status e Previsão</h3></div><p class="text-sm text-gray mb-2">Atualize o status e, se necessário, informe uma nova previsão de entrega. O cliente será notificado automaticamente.</p><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"><input class="input-field" id="updId" placeholder="Código do pedido" style="flex:1;min-width:150px;"><select class="input-field" id="updStatus" style="min-width:140px;"><option>Recebido</option><option>Separação</option><option>Carregado</option><option>Em Rota</option><option>Entregue</option><option>Atrasado</option></select><input class="input-field" id="updNewPrev" placeholder="Nova previsão (ex: 18:00)" style="min-width:150px;"><button class="btn btn-warning" id="updStatusBtn"><i class="fas fa-bell"></i> Atualizar e Notificar</button></div></div>';
+            h+='<div class="card"><div class="card-header"><h3><i class="fas fa-truck-moving"></i> Gestão de Frota</h3></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Placa</th><th>Motorista</th><th>Capacidade</th><th>Status</th><th>Manutenção</th></tr></thead><tbody>'+f.map(function(v){return '<tr><td>'+v.id+'</td><td>'+v.placa+'</td><td>'+v.motorista+'</td><td>'+v.capacidade+'</td><td>'+v.status+'</td><td style="color:'+(v.manutencao==='OK'?'green':'red')+'">'+v.manutencao+'</td></tr>';}).join('')+'</tbody></table></div><form id="addFleetForm" class="form-grid mt-2"><input class="input-field" id="fId" placeholder="ID"><input class="input-field" id="fPlaca" placeholder="Placa"><input class="input-field" id="fMot" placeholder="Motorista"><input class="input-field" id="fCap" placeholder="Capacidade"><select class="input-field" id="fStatus"><option>Disponível</option><option>Em rota</option><option>Manutenção</option></select><button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Adicionar</button></form></div>';
+            h+='<div class="card"><div class="card-header"><h3><i class="fas fa-chart-bar"></i> Relatórios</h3></div><p><strong>OTIF:</strong> '+(d.length?((d.filter(function(x){return x.status==='Entregue'}).length/d.length)*100).toFixed(1):0)+'% | <strong>Custo Médio Frete:</strong> R$ '+(d.length*350).toLocaleString()+'</p></div></div>';
+            return h;
+        }
+
+        // ========== TORRE DE CONTROLE ==========
+        function torreView(){
+            var trucks=STATE.fleet.filter(function(v){return v.status==='Em rota';});
+            return '<div style="max-width:1200px;margin:40px auto;padding:0 20px;"><div class="card"><div class="card-header"><h3><i class="fas fa-map"></i> Torre de Controle</h3><span>'+trucks.length+' veículos</span></div><div class="map-container">'+trucks.map(function(v,i){return '<div style="position:absolute;top:'+(25+i*20)+'%;left:'+(30+i*18)+'%;font-size:1.5rem;color:#f57c00;" title="'+v.id+' - '+v.motorista+'"><i class="fas fa-truck"></i></div>';}).join('')+'</div></div></div>';
+        }
+
+        // ========== APP MOTORISTA ==========
+        function motoristaView(){
+            var minhas=STATE.deliveries.filter(function(d){return d.motorista===STATE.user.name||d.motorista==='Marcos Silva';});
+            if(!minhas.length)minhas=[{id:'ST-1001',destino:'Campinas SP',status:'Em Rota',previsao:'16:30',produto:'Tubos 4"'}];
+            return '<div style="max-width:440px;margin:40px auto;padding:0 20px;"><div style="background:white;border-radius:22px;box-shadow:0 8px 40px rgba(0,0,0,.2);overflow:hidden;"><div style="background:var(--primary);color:white;padding:14px;text-align:center;font-weight:700;">App Motorista<div style="font-size:.7rem;opacity:.7;">'+STATE.user.name+'</div></div><div style="padding:16px;"><div style="padding:12px;margin-bottom:10px;"><strong>Rota do Dia</strong><svg viewBox="0 0 400 180" style="width:100%;height:140px;background:#e8ecf1;border-radius:12px;margin:8px 0;"><path d="M30,150 L120,120 L220,90 L320,50" stroke="#f57c00" stroke-width="4" fill="none" stroke-dasharray="8,4"/><circle cx="30" cy="150" r="7" fill="#0d2137"/><circle cx="120" cy="120" r="7" fill="#0d2137"/><circle cx="220" cy="90" r="7" fill="#f57c00"/><circle cx="320" cy="50" r="7" fill="#0d2137"/></svg><p style="font-size:.7rem;">?? Origem: CD ? Destino: '+minhas[minhas.length-1].destino+' | ETA: '+minhas[0].previsao+'</p></div>'+minhas.map(function(d,i){return '<div style="background:#f5f5f5;padding:8px;border-radius:6px;margin:4px 0;border-left:3px solid '+(i===0?'#f57c00':'#ccc')+';"><strong>'+(i+1)+'. '+d.id+'</strong> — '+d.destino+'<br><span class="status-badge status-'+d.status.toLowerCase().replace(' ','-')+'">'+d.status+'</span></div>';}).join('')+'<div style="padding:12px;margin:10px 0;"><button class="btn btn-success btn-sm" id="rfidBtn" style="width:100%;"><i class="fas fa-qrcode"></i> Simular RFID</button><p id="rfidResult" class="text-sm text-gray mt-2"></p></div><div style="padding:12px;"><strong>Checklist</strong>'+['Pneus','Freios','Combustível','Documentação'].map(function(i){return '<label style="display:flex;align-items:center;gap:8px;font-size:.8rem;padding:4px 0;"><input type="checkbox" checked> '+i+'</label>';}).join('')+'</div><form id="podForm" style="padding:12px;"><input class="input-field" id="podId" placeholder="Nº Pedido" style="margin-bottom:6px;"><input class="input-field" id="podCli" placeholder="Quem recebeu" style="margin-bottom:6px;"><button type="submit" class="btn btn-warning btn-sm" style="width:100%;"><i class="fas fa-camera"></i> Registrar</button></form></div></div></div>';
+        }
+
+        // ========== HISTÓRICO ==========
+        function historyView(){
+            var h='<div style="max-width:1200px;margin:40px auto;padding:0 20px;"><div class="card"><div class="card-header"><h3><i class="fas fa-history"></i> Histórico</h3></div>';
+            if(!STATE.history.length)h+='<p class="text-gray">Nenhuma atividade.</p>';
+            else{h+='<div class="table-wrap"><table><thead><tr><th>Data</th><th>Usuário</th><th>Ação</th><th>Detalhes</th></tr></thead><tbody>';STATE.history.forEach(function(e){h+='<tr><td>'+new Date(e.time).toLocaleString('pt-BR')+'</td><td>'+e.user+'</td><td>'+e.action+'</td><td>'+e.detail+'</td></tr>';});h+='</tbody></table></div>';}
+            return h+'</div></div>';
+        }
+
+        // ========== ACTIONS ==========
+        function quickLogin(email){var u=STATE.users.find(function(x){return x.email===email&&x.pass==='123456';});if(u){STATE.user=u;navigateTo('home');addHistory('Login','Usuário '+u.name+' logou.');}}
+        function handleLogin(e){e.preventDefault();var u=STATE.users.find(function(x){return x.email===document.getElementById('loginEmail').value.trim()&&x.pass===document.getElementById('loginPassword').value;});if(u){STATE.user=u;navigateTo('home');addHistory('Login','Usuário '+u.name+' logou.');}else alert('Credenciais inválidas.');}
+        function logout(){STATE.user=null;navigateTo('home');}
+        function doTrack(){
+            var c=document.getElementById('trackInput')?document.getElementById('trackInput').value.trim():'';
+            var el=document.getElementById('trackResult');if(!c){el.innerHTML='<p style="color:var(--danger);">Digite um código.</p>';return;}
+            var d=STATE.deliveries.find(function(x){return x.id===c;});
+            if(!d){el.innerHTML='<p style="color:var(--danger);">Pedido não encontrado.</p>';return;}
+            var allSteps=['Recebido','Separação','Carregado','Em Rota','Entregue'],currentIdx=allSteps.indexOf(d.status);
+            if(d.status==='Atrasado')currentIdx=3;
+            var tl='<div class="card mt-2"><h4>?? '+d.id+' - '+d.produto+'</h4><p><strong>Cliente:</strong> '+d.cliente+' | <strong>Motorista:</strong> '+d.motorista+' | <strong>Previsão:</strong> '+d.previsao+'</p><div class="timeline">';
+            allSteps.forEach(function(s,i){var cls='';if(i<currentIdx)cls='passed';else if(i===currentIdx&&d.status!=='Atrasado')cls='current';tl+='<div class="tl-item '+cls+'"><i class="fas fa-'+(i<=currentIdx?'check':'circle')+'"></i> '+s+'</div>';});
+            if(d.status==='Atrasado')tl+='<div class="tl-item current" style="background:#ffebee;"><i class="fas fa-exclamation-triangle"></i> ?? Atrasado</div>';
+            el.innerHTML=tl+'</div></div>';
+        }
+        function doSimulate(){
+            var o=document.getElementById('cepO')?document.getElementById('cepO').value.trim():'';
+            var d=document.getElementById('cepD')?document.getElementById('cepD').value.trim():'';
+            var p=parseFloat(document.getElementById('peso')?document.getElementById('peso').value:100)||100;
+            var s=document.getElementById('servico')?document.getElementById('servico').value:'PAC';
+            var el=document.getElementById('simResult');
+            if(!o||!d||o.length<8||d.length<8){el.innerHTML='<p style="color:var(--danger);">CEPs inválidos.</p>';return;}
+            el.innerHTML='<div style="background:#f0fdf4;padding:14px;border-radius:8px;"><strong>'+s+'</strong><br>Valor: R$ '+(p*(s==='SEDEX'?4.5:s==='Carga Fechada'?3:2.5)).toFixed(2)+'<br>Prazo: '+(s==='SEDEX'?3:s==='Carga Fechada'?5:7)+' dias</div>';
+        }
+        function addDelivery(e){
+            e.preventDefault();var id=document.getElementById('nId').value.trim();
+            if(STATE.deliveries.some(function(x){return x.id===id;})){alert('Código duplicado.');return;}
+            var del={id:id,cliente:document.getElementById('nCli').value,produto:document.getElementById('nProd').value,origem:document.getElementById('nOrig').value,destino:document.getElementById('nDest').value,status:document.getElementById('nStatus').value,motorista:document.getElementById('nMot').value||'-',veiculo:document.getElementById('nVei').value||'-',previsao:document.getElementById('nPrev').value||'—',data:new Date().toISOString().slice(0,10),peso:'—',nota:'—',clienteEmail:'cliente@obra.com',clienteTel:STATE.contacts['cliente@obra.com']||'5537999999999',etapas:['Recebido']};
+            // Adiciona também ao histórico de compras se status for Entregue
+            if(del.status==='Entregue'){STATE.purchaseHistory.unshift({id:del.id,cliente:del.cliente,produto:del.produto,quantidade:'—',data:del.data,valor:'—',nota:'—',status:'Entregue'});}
+            STATE.deliveries.push(del);saveAll();addHistory('Novo Pedido','Pedido '+del.id+' cadastrado.');notifyCustomer(del);alert('Pedido criado!');navigateTo('admin');
+        }
+        function updateStatus(){
+            var id=document.getElementById('updId')?document.getElementById('updId').value.trim():'';
+            var st=document.getElementById('updStatus')?document.getElementById('updStatus').value:'';
+            var newPrev=document.getElementById('updNewPrev')?document.getElementById('updNewPrev').value.trim():'';
+            var del=STATE.deliveries.find(function(x){return x.id===id;});
+            if(!del){alert('Pedido não encontrado.');return;}
+            del.status=st;if(!del.etapas)del.etapas=[];if(!del.etapas.includes(st))del.etapas.push(st);
+            if(newPrev){del.previsao=newPrev;addHistory('Previsão Atualizada','Pedido '+del.id+' nova previsão: '+newPrev);}
+            if(st==='Entregue'){STATE.purchaseHistory.unshift({id:del.id,cliente:del.cliente,produto:del.produto,quantidade:del.peso||'—',data:new Date().toISOString().slice(0,10),valor:'—',nota:del.nota||'—',status:'Entregue'});}
+            saveAll();addHistory('Status Atualizado','Pedido '+del.id+' ? '+st+(newPrev?' | Nova previsão: '+newPrev:''));notifyCustomer(del);
+            if(newPrev)addNotification('?? Nova Previsão','Pedido '+del.id+': nova previsão de entrega: '+newPrev,'info');
+            alert('Status atualizado'+(newPrev?' e nova previsão informada':'')+'! Cliente notificado.');navigateTo('admin');
+        }
+        function submitPOD(e){
+            e.preventDefault();var id=document.getElementById('podId')?document.getElementById('podId').value:'',cli=document.getElementById('podCli')?document.getElementById('podCli').value:'';
+            if(!id||!cli){alert('Preencha os campos.');return;}
+            var del=STATE.deliveries.find(function(x){return x.id===id;});
+            if(del){del.status='Entregue';if(!del.etapas.includes('Entregue'))del.etapas.push('Entregue');STATE.purchaseHistory.unshift({id:del.id,cliente:del.cliente,produto:del.produto,quantidade:del.peso||'—',data:new Date().toISOString().slice(0,10),valor:'—',nota:del.nota||'—',status:'Entregue'});saveAll();addHistory('Entrega','Pedido '+del.id+' entregue para '+cli);notifyCustomer(del);}
+            alert('Entrega registrada!');navigateTo('motorista');
+        }
+        function readRFID(){document.getElementById('rfidResult').innerHTML='<span style="color:var(--success);"><i class="fas fa-check-circle"></i> RFID lido! Carga confirmada.</span>';addHistory('RFID','Carga verificada.');}
+        function addFleet(e){e.preventDefault();var v={id:document.getElementById('fId').value,placa:document.getElementById('fPlaca').value,motorista:document.getElementById('fMot').value,capacidade:document.getElementById('fCap').value,status:document.getElementById('fStatus').value,manutencao:'OK'};STATE.fleet.push(v);saveAll();addHistory('Frota','Veículo '+v.id+' adicionado.');alert('Veículo adicionado!');navigateTo('admin');}
+        document.addEventListener('DOMContentLoaded',function(){render();});
+    </script>
+</body>
+</html>
